@@ -1,10 +1,14 @@
-import { useState } from 'react'
-import { Menu, X, Plus, LayoutDashboard, Inbox, Users, Settings, ChevronDown, ChevronLeft, ChevronRight } from 'lucide-react'
-import { motion, AnimatePresence } from 'motion/react'
+import { useState } from "react";
+import {
+  Menu, X, Plus, LayoutDashboard, Inbox, Users, Settings, ChevronDown,
+  ListTodoIcon, BellRing, UserRound, HelpCircle, PanelLeftClose, PanelLeftOpen
+} from 'lucide-react'
+import { motion, AnimatePresence } from "motion/react";
+import Logo from "../../assets/Logo.png";
 
 export default function Layout({ children }) {
-  const [sidebarOpen, setSidebarOpen] = useState(true)
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   return (
     <div className="flex h-screen bg-gray-50">
@@ -15,10 +19,10 @@ export default function Layout({ children }) {
             initial={{ x: -280 }}
             animate={{
               x: 0,
-              width: sidebarCollapsed ? 80 : 256
+              width: sidebarCollapsed ? 80 : 256,
             }}
             exit={{ x: -280 }}
-            transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+            transition={{ type: "spring", damping: 25, stiffness: 200 }}
             className="fixed lg:static inset-y-0 left-0 z-50 bg-white border-r border-gray-200 flex flex-col"
           >
             {/* Sidebar Header */}
@@ -30,19 +34,37 @@ export default function Layout({ children }) {
                   exit={{ opacity: 0 }}
                   className="flex items-center gap-2"
                 >
-                  <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-                    <span className="text-white font-bold text-sm">TB</span>
-                  </div>
+                  <img
+                    src={Logo}
+                    alt="TaskBoard Logo"
+                    className="w-8 h-8 rounded-lg object-contain"
+                  />
                   <span className="font-semibold text-gray-900">TaskBoard</span>
                 </motion.div>
               )}
 
               {sidebarCollapsed && (
-                <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center mx-auto">
-                  <span className="text-white font-bold text-sm">TB</span>
-                </div>
+                <img
+                  src={Logo}
+                  alt="TaskBoard"
+                  className="w-8 h-8 rounded-lg object-contain mx-auto"
+                />
               )}
 
+              {/* Desktop Collapse Button - Top Right */}
+              <button
+                onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+                className="hidden lg:flex p-1.5 hover:bg-gray-100 rounded-lg transition-colors"
+                title={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+              >
+                {sidebarCollapsed ? (
+                  <PanelLeftOpen className="w-5 h-5 text-gray-600" />
+                ) : (
+                  <PanelLeftClose className="w-5 h-5 text-gray-600" />
+                )}
+              </button>
+
+              {/* Mobile Close Button */}
               <button
                 onClick={() => setSidebarOpen(false)}
                 className="lg:hidden p-1.5 hover:bg-gray-100 rounded-lg"
@@ -51,25 +73,16 @@ export default function Layout({ children }) {
               </button>
             </div>
 
-            {/* Workspace Selector */}
-            {!sidebarCollapsed && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="p-4"
-              >
-                <button className="w-full flex items-center justify-between px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg">
-                  <span>OnPoint Studio</span>
-                  <ChevronDown className="w-4 h-4" />
-                </button>
-              </motion.div>
-            )}
-
             {/* Add New Button */}
-            <div className="px-4 pb-4">
-              <button className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-                <Plus className="w-5 h-5" />
+            <div className={`px-4 py-4 ${sidebarCollapsed ? 'flex justify-center' : ''}`}>
+              <button
+                className={`flex items-center justify-center gap-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors ${
+                  sidebarCollapsed
+                    ? 'w-10 h-10 p-0'
+                    : 'w-full py-2.5'
+                }`}
+              >
+                <Plus className="w-5 h-5 flex-shrink-0" />
                 {!sidebarCollapsed && (
                   <motion.span
                     initial={{ opacity: 0 }}
@@ -116,7 +129,9 @@ export default function Layout({ children }) {
                   className="pt-6"
                 >
                   <div className="flex items-center justify-between px-3 py-2">
-                    <span className="text-xs font-semibold text-gray-500 uppercase">Projects</span>
+                    <span className="text-xs font-semibold text-gray-500 uppercase">
+                      Projects
+                    </span>
                     <button className="p-1 hover:bg-gray-100 rounded">
                       <Plus className="w-4 h-4 text-gray-400" />
                     </button>
@@ -129,36 +144,42 @@ export default function Layout({ children }) {
               )}
             </nav>
 
-            {/* Collapse Toggle Button (Desktop Only) */}
-            <div className="hidden lg:block p-4 border-t border-gray-200">
-              <button
-                onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-                className="w-full flex items-center justify-center p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
-                title={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
-              >
-                {sidebarCollapsed ? (
-                  <ChevronRight className="w-5 h-5" />
-                ) : (
-                  <>
-                    <ChevronLeft className="w-5 h-5" />
-                    <span className="ml-2 text-sm font-medium">Collapse</span>
-                  </>
-                )}
-              </button>
-            </div>
-
-            {/* Invite Team Footer (Mobile) */}
+            {/* Invite Team & Help Footer */}
             {!sidebarCollapsed && (
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                className="lg:hidden p-4 border-t border-gray-200"
+                className="p-4 border-t border-gray-200"
               >
-                <button className="text-sm text-gray-600 hover:text-gray-900">
-                  Invite Team
-                </button>
+                <div className="flex items-center justify-between gap-2">
+                  <button className="text-sm text-gray-600 hover:text-gray-900 font-medium transition-colors">
+                    Invite Team
+                  </button>
+                  <button className="flex items-center gap-1 text-sm text-gray-600 hover:text-gray-900 font-medium transition-colors">
+                    <HelpCircle className="w-4 h-4" />
+                    <span>Help</span>
+                  </button>
+                </div>
               </motion.div>
+            )}
+
+            {/* Collapsed Footer Icons */}
+            {sidebarCollapsed && (
+              <div className="hidden lg:flex flex-col items-center gap-2 p-4 border-t border-gray-200">
+                <button
+                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                  title="Invite Team"
+                >
+                  <Users className="w-5 h-5 text-gray-600" />
+                </button>
+                <button
+                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                  title="Help"
+                >
+                  <HelpCircle className="w-5 h-5 text-gray-600" />
+                </button>
+              </div>
             )}
           </motion.aside>
         )}
@@ -175,45 +196,47 @@ export default function Layout({ children }) {
       {/* Main Content */}
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Header */}
-        <header className="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-6">
-          <div className="flex items-center gap-4">
+        <header className="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-4 lg:px-6">
+          {/* Left: Mobile Menu Only */}
+          <div className="flex items-center">
             <button
               onClick={() => setSidebarOpen(true)}
               className="p-2 hover:bg-gray-100 rounded-lg lg:hidden"
             >
               <Menu className="w-5 h-5 text-gray-600" />
             </button>
+          </div>
 
-            {/* Search Bar */}
-            <div className="hidden md:flex items-center gap-2 px-4 py-2 bg-gray-100 rounded-lg w-96">
-              <span className="text-gray-400">🔍</span>
+          {/* Center: Search Bar */}
+          <div className="flex-1 flex justify-center px-4">
+            <div className="flex items-center gap-2 px-3 py-2 bg-gray-100 rounded-lg w-full max-w-md border border-gray-300/60 text-lg">
               <input
                 type="text"
-                placeholder="Search"
-                className="bg-transparent border-none outline-none text-sm w-full"
+                placeholder="Search Task..."
+                className="bg-transparent border-none outline-none text-sm w-full placeholder:text-gray-500"
               />
             </div>
           </div>
 
-          {/* Right Side Actions */}
-          <div className="flex items-center gap-3">
-            <button className="p-2 hover:bg-gray-100 rounded-lg">
-              <span className="text-gray-600">📋</span>
+          {/* Right: Action Buttons */}
+          <div className="flex items-center gap-2">
+            <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+              <ListTodoIcon className="w-5 h-5 text-gray-600" />
             </button>
-            <button className="p-2 hover:bg-gray-100 rounded-lg">
-              <span className="text-gray-600">🔔</span>
+            <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+              <BellRing className="w-5 h-5 text-gray-600" />
             </button>
-            <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full" />
+            <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+              <UserRound className="w-5 h-5 text-gray-600" />
+            </button>
           </div>
         </header>
 
         {/* Page Content */}
-        <main className="flex-1 overflow-y-auto">
-          {children}
-        </main>
+        <main className="flex-1 overflow-y-auto">{children}</main>
       </div>
     </div>
-  )
+  );
 }
 
 // Nav Item Component
@@ -221,7 +244,7 @@ function NavItem({ icon: Icon, label, badge, collapsed }) {
   return (
     <button
       className="w-full flex items-center justify-between px-3 py-2 text-gray-700 hover:bg-gray-100 rounded-lg group"
-      title={collapsed ? label : ''}
+      title={collapsed ? label : ""}
     >
       <div className="flex items-center gap-3">
         <Icon className="w-5 h-5 text-gray-500 group-hover:text-gray-700" />
@@ -247,7 +270,7 @@ function NavItem({ icon: Icon, label, badge, collapsed }) {
         </motion.span>
       )}
     </button>
-  )
+  );
 }
 
 // Project Item Component
@@ -256,12 +279,12 @@ function ProjectItem({ name, active }) {
     <button
       className={`w-full flex items-center gap-3 px-3 py-2 text-sm rounded-lg ${
         active
-          ? 'bg-blue-50 text-blue-600 font-medium'
-          : 'text-gray-700 hover:bg-gray-100'
+          ? "bg-blue-50 text-blue-600 font-medium"
+          : "text-gray-700 hover:bg-gray-100"
       }`}
     >
       <div className="w-1.5 h-1.5 rounded-full bg-current" />
       <span>{name}</span>
     </button>
-  )
+  );
 }
