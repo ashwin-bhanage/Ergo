@@ -2,52 +2,74 @@ import { useState, useEffect } from 'react'
 import { Plus, Filter, Calendar, User, ChevronDown, PenLine, Rows2 } from 'lucide-react'
 import { motion } from 'motion/react'
 import { taskAPI, projectAPI, userAPI } from '../services/api'
+import TaskModal from "./TaskModal";
 
 export default function KanbanBoard() {
-  const [tasks, setTasks] = useState([])
-  const [users, setUsers] = useState([])
-  const [activeTab, setActiveTab] = useState('List') // Track active tab
+  const [tasks, setTasks] = useState([]);
+  const [users, setUsers] = useState([]);
+  const [projects, setProjects] = useState([]);
+  const [activeTab, setActiveTab] = useState("List"); // Track active tab
   const [filters, setFilters] = useState({
-    assignee: 'All',
-    priority: 'All',
-    dateRange: 'All'
-  })
-  const [loading, setLoading] = useState(true)
+    assignee: "All",
+    priority: "All",
+    dateRange: "All",
+  });
+  const [loading, setLoading] = useState(true);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingTask, setEditingTask] = useState(null);
+  const [newTaskStatus, setNewTaskStatus] = useState("pending");
 
   // Fetch data on mount
   useEffect(() => {
-    fetchData()
-  }, [])
+    fetchData();
+  }, []);
 
   const fetchData = async () => {
     try {
-      setLoading(true)
-      const [tasksData, usersData] = await Promise.all([
+      setLoading(true);
+      const [tasksData, usersData, projectsData] = await Promise.all([
         taskAPI.getAll(),
-        userAPI.getAll()
-      ])
-      setTasks(tasksData)
-      setUsers(usersData)
+        userAPI.getAll(),
+        projectAPI.getAll(),
+      ]);
+      setTasks(tasksData);
+      setUsers(usersData);
+      setProjects(projectsData);
     } catch (error) {
-      console.error('Failed to fetch data:', error)
+      console.error("Failed to fetch data:", error);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
+
+  const handleAddTask = (status) => {
+    setNewTaskStatus(status);
+    setIsModalOpen(true);
+    setEditingTask(null);
+  };
+
+  const handleEditTask = (task) => {
+    setEditingTask(task);
+    setIsModalOpen(true);
+  };
+
+  const handleModalSuccess = () => {
+    fetchData();
+  };
 
   // Group tasks by status
   const tasksByStatus = {
-    pending: tasks.filter(t => t.status === 'pending'),
-    in_progress: tasks.filter(t => t.status === 'in_progress'),
-    completed: tasks.filter(t => t.status === 'completed')
-  }
+    pending: tasks.filter((t) => t.status === "pending"),
+    in_progress: tasks.filter((t) => t.status === "in_progress"),
+    completed: tasks.filter((t) => t.status === "completed"),
+  };
 
   if (loading) {
     return (
       <div className="flex items-center justify-center h-full">
         <div className="text-gray-500">Loading tasks...</div>
       </div>
-    )
+    );
   }
 
   return (
@@ -56,10 +78,14 @@ export default function KanbanBoard() {
       <div className="bg-white border-b border-gray-200 px-6 py-4">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
-            <span className='text-violet-400'><Rows2 /></span>
+            <span className="text-violet-400">
+              <Rows2 />
+            </span>
             <h1 className="text-2xl font-bold text-gray-900">Design Project</h1>
             <button className="p-1 hover:bg-gray-100 rounded">
-              <span className="text-gray-400 cursor-pointer"><PenLine /></span>
+              <span className="text-gray-400 cursor-pointer">
+                <PenLine />
+              </span>
             </button>
           </div>
 
@@ -76,23 +102,23 @@ export default function KanbanBoard() {
           <div className="flex items-center gap-6 ">
             <TabButton
               label="List"
-              active={activeTab === 'List'}
-              onClick={() => setActiveTab('List')}
+              active={activeTab === "List"}
+              onClick={() => setActiveTab("List")}
             />
             <TabButton
               label="Board"
-              active={activeTab === 'Board'}
-              onClick={() => setActiveTab('Board')}
+              active={activeTab === "Board"}
+              onClick={() => setActiveTab("Board")}
             />
             <TabButton
               label="Calendar"
-              active={activeTab === 'Calendar'}
-              onClick={() => setActiveTab('Calendar')}
+              active={activeTab === "Calendar"}
+              onClick={() => setActiveTab("Calendar")}
             />
             <TabButton
               label="Files"
-              active={activeTab === 'Files'}
-              onClick={() => setActiveTab('Files')}
+              active={activeTab === "Files"}
+              onClick={() => setActiveTab("Files")}
             />
           </div>
 
@@ -117,7 +143,10 @@ export default function KanbanBoard() {
               <Filter className="w-4 h-4" />
               Advance Filters
             </button>
-            <button className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 flex items-center gap-2">
+            <button
+              onClick={() => handleAddTask("pending")}
+              className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 flex items-center gap-2"
+            >
               <Plus className="w-4 h-4" />
               Add New
             </button>
@@ -133,14 +162,16 @@ export default function KanbanBoard() {
             icon="⏸️"
             tasks={tasksByStatus.pending}
             users={users}
-            onAddTask={() => console.log('Add pending task')}
+            onAddTask={() => handleAddTask("pending")}
+            onEditTask={handleEditTask}
           />
           <KanbanColumn
             title="In Progress"
             icon="⚠️"
             tasks={tasksByStatus.in_progress}
             users={users}
-            onAddTask={() => console.log('Add in progress task')}
+            onAddTask={() => handleAddTask("in_progress")}
+            onEditTask={handleEditTask}
             statusColor="yellow"
           />
           <KanbanColumn
@@ -148,13 +179,23 @@ export default function KanbanBoard() {
             icon="✅"
             tasks={tasksByStatus.completed}
             users={users}
-            onAddTask={() => console.log('Add completed task')}
+            onAddTask={() => handleAddTask("completed")}
+            onEditTask={handleEditTask}
             statusColor="green"
           />
         </div>
       </div>
+
+      <TaskModal
+      isOpen={isModalOpen}
+      onClose={() => setIsModalOpen(false)}
+      task={editingTask}
+      users={users}
+      projects={projects}
+      onSuccess={handleModalSuccess}
+      />
     </div>
-  )
+  );
 }
 
 // Tab Button Component with Active State
@@ -186,7 +227,7 @@ function FilterButton({ icon: Icon, label, value }) {
 }
 
 // Kanban Column Component
-function KanbanColumn({ title, icon, tasks, users, onAddTask, statusColor }) {
+function KanbanColumn({ title, icon, tasks, users, onAddTask, onEditTask, statusColor }) {
   const getStatusColor = () => {
     switch(statusColor) {
       case 'yellow': return 'bg-yellow-100 text-yellow-800'
@@ -220,6 +261,7 @@ function KanbanColumn({ title, icon, tasks, users, onAddTask, statusColor }) {
             key={task.id}
             task={task}
             users={users}
+            onEdit={onEditTask}
           />
         ))}
 
@@ -259,6 +301,7 @@ function TaskCard({ task, users }) {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
+      onClick={() => onEdit(task)}
       className="bg-white rounded-lg p-4 shadow-sm border border-gray-200 hover:shadow-md transition-shadow cursor-pointer"
     >
       {/* Task Title */}
