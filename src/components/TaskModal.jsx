@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { X, Calendar as CalendarIcon, User, Flag } from 'lucide-react'
+import { X, Calendar as CalendarIcon, User, Flag, Book } from 'lucide-react'
 import { motion, AnimatePresence } from 'motion/react'
 import { taskAPI } from '../services/api'
 
@@ -204,6 +204,7 @@ export default function TaskModal({ isOpen, onClose, task, users, projects, onSu
                   {/* Project */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <Book className="w-4 h-4 inline mr-1" />
                       Project
                     </label>
                     <select
