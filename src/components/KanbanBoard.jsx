@@ -150,7 +150,8 @@ export default function KanbanBoard({ selectedProject, onDataUpdate }) {
 
   function filterTasks(tasks) {
     return tasks.filter((task) => {
-      if (filters.assignee && task.user_id !== filters.assignee) return false;
+      if (filters.assignee && String(task.user_id) !== String(filters.assignee))
+        return false;
       if (filters.priority && task.priority !== filters.priority) return false;
       if (filters.dateRange) {
         const today = new Date();
@@ -330,7 +331,7 @@ export default function KanbanBoard({ selectedProject, onDataUpdate }) {
                     : "border-transparent text-gray-600"
                 }`}
               >
-                Pending ({tasksByStatus.pending.length})
+                Pending ({filteredTasksByStatus.pending.length})
               </button>
               <button
                 onClick={() => setActiveTab("In Progress")}
@@ -340,7 +341,7 @@ export default function KanbanBoard({ selectedProject, onDataUpdate }) {
                     : "border-transparent text-gray-600"
                 }`}
               >
-                In Progress ({tasksByStatus.in_progress.length})
+                In Progress ({filteredTasksByStatus.in_progress.length})
               </button>
               <button
                 onClick={() => setActiveTab("Completed")}
@@ -350,13 +351,13 @@ export default function KanbanBoard({ selectedProject, onDataUpdate }) {
                     : "border-transparent text-gray-600"
                 }`}
               >
-                Done ({tasksByStatus.completed.length})
+                Done ({filteredTasksByStatus.completed.length})
               </button>
             </div>
             <div className="flex-1 overflow-y-auto p-3">
               {activeTab === "Pending" && (
                 <MobileColumn
-                  tasks={tasksByStatus.pending}
+                  tasks={filteredTasksByStatus.pending}
                   users={users}
                   onAddTask={() => handleAddTask("pending")}
                   onEditTask={handleEditTask}
@@ -365,7 +366,7 @@ export default function KanbanBoard({ selectedProject, onDataUpdate }) {
               )}
               {activeTab === "In Progress" && (
                 <MobileColumn
-                  tasks={tasksByStatus.in_progress}
+                  tasks={filteredTasksByStatus.in_progress}
                   users={users}
                   onAddTask={() => handleAddTask("in_progress")}
                   onEditTask={handleEditTask}
@@ -374,7 +375,7 @@ export default function KanbanBoard({ selectedProject, onDataUpdate }) {
               )}
               {activeTab === "Completed" && (
                 <MobileColumn
-                  tasks={tasksByStatus.completed}
+                  tasks={filteredTasksByStatus.completed}
                   users={users}
                   onAddTask={() => handleAddTask("completed")}
                   onEditTask={handleEditTask}
@@ -590,7 +591,7 @@ function DraggableTask({ task, users, onEdit }) {
         <div className="flex items-center gap-2">
           {assignedUser ? (
             <>
-              <div className="w-6 h-6 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white text-xs font-semibold">
+              <div className="w-6 h-6 bg-linear-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white text-xs font-semibold">
                 {assignedUser.name[0].toUpperCase()}
               </div>
               <span className="text-xs text-gray-600">
@@ -657,19 +658,21 @@ function FilterButton({
         <span className="text-gray-500 text-xs hidden sm:inline whitespace-nowrap">
           {displayValue}
         </span>
-        <ChevronDown className="w-4 h-4 text-gray-400 flex-shrink-0" />
+        <ChevronDown className="w-4 h-4 text-gray-400 shrink-0" />
       </button>
 
       {showDropdown === filterKey && (
         <>
-          <div className="absolute top-full left-0 mt-2 bg-white border border-gray-200 rounded-lg shadow-lg py-2 z-50 min-w-[160px]">
+          <div className="absolute top-full left-0 mt-2 bg-white border border-gray-200 rounded-lg shadow-xl py-2 z-50 min-w-48 max-w-xs sm:right-0 sm:left-auto">
             <button
               onClick={() => {
                 setFilters({ ...filters, [filterKey]: null });
                 setShowDropdown(null);
               }}
-              className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-50 ${
-                !value ? "text-blue-600 font-medium" : "text-gray-700"
+              className={`w-full text-left px-4 py-3 text-sm hover:bg-gray-50 transition-colors ${
+                !value
+                  ? "text-blue-600 font-medium bg-blue-50"
+                  : "text-gray-700"
               }`}
             >
               All
@@ -681,9 +684,9 @@ function FilterButton({
                   setFilters({ ...filters, [filterKey]: option.value });
                   setShowDropdown(null);
                 }}
-                className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-50 ${
+                className={`w-full text-left px-4 py-3 text-sm hover:bg-gray-50 transition-colors ${
                   value === option.value
-                    ? "text-blue-600 font-medium"
+                    ? "text-blue-600 font-medium bg-blue-50"
                     : "text-gray-700"
                 }`}
               >
@@ -734,7 +737,7 @@ function TaskCard({ task, users, onEdit }) {
         <div className="flex items-center gap-2">
           {assignedUser ? (
             <>
-              <div className="w-5 h-5 lg:w-6 lg:h-6 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white text-xs font-semibold">
+              <div className="w-5 h-5 lg:w-6 lg:h-6 bg-linear-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white text-xs font-semibold">
                 {assignedUser.name[0].toUpperCase()}
               </div>
               <span className="text-xs text-gray-600 truncate">
