@@ -130,7 +130,7 @@ export default function TaskModal({
               className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[95vh] sm:max-h-[90vh] flex flex-col overflow-hidden border border-gray-100"
             >
               {/* Modal Header */}
-              <div className="flex items-center justify-between px-4 py-4 sm:px-6 sm:py-5 border-b border-gray-100 shrink-0 bg-gradient-to-r from-gray-50 to-white">
+              <div className="flex items-center justify-between px-4 py-4 sm:px-6 sm:py-5 border-b border-gray-100 shrink-0 bg-linear-to-r from-gray-50 to-white">
                 <div>
                   <h2 className="text-lg sm:text-2xl font-bold text-gray-900">
                     {task ? "Edit Task" : "Create New Task"}
@@ -143,7 +143,7 @@ export default function TaskModal({
                 </div>
                 <button
                   onClick={onClose}
-                  className="p-2 hover:bg-gray-200 rounded-lg transition-colors flex-shrink-0"
+                  className="p-2 hover:bg-gray-200 rounded-lg transition-colors shrink-0"
                 >
                   <X className="w-5 h-5 text-gray-500" />
                 </button>
@@ -197,7 +197,7 @@ export default function TaskModal({
                 {/* Row: Assignee & Project */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5">
                   <div>
-                    <label className="block text-sm font-semibold text-gray-900 mb-2 flex items-center gap-2">
+                    <label className="flex text-sm font-semibold text-gray-900 mb-2 items-center gap-2">
                       <User className="w-4 h-4 text-blue-600" />
                       Assignee <span className="text-red-500">*</span>
                     </label>
@@ -226,7 +226,7 @@ export default function TaskModal({
                   </div>
 
                   <div>
-                    <label className="block text-sm font-semibold text-gray-900 mb-2 flex items-center gap-2">
+                    <label className="flex text-sm font-semibold text-gray-900 mb-2 items-center gap-2">
                       <Book className="w-4 h-4 text-purple-600" />
                       Project <span className="text-red-500">*</span>
                     </label>
@@ -275,7 +275,7 @@ export default function TaskModal({
                   </div>
 
                   <div>
-                    <label className="block text-sm font-semibold text-gray-900 mb-2 flex items-center gap-2">
+                    <label className="flex text-sm font-semibold text-gray-900 mb-2 items-center gap-2">
                       <Flag className="w-4 h-4 text-orange-600" />
                       Priority
                     </label>
@@ -291,7 +291,7 @@ export default function TaskModal({
                   </div>
 
                   <div className="sm:col-span-2 md:col-span-1">
-                    <label className="block text-sm font-semibold text-gray-900 mb-2 flex items-center gap-2">
+                    <label className="flex text-sm font-semibold text-gray-900 mb-2 items-center gap-2">
                       <CalendarIcon className="w-4 h-4 text-green-600" />
                       Due Date
                     </label>
@@ -310,7 +310,7 @@ export default function TaskModal({
                     animate={{ opacity: 1, y: 0 }}
                     className="p-4 bg-red-50 border-2 border-red-200 rounded-lg flex items-start gap-3"
                   >
-                    <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+                    <AlertCircle className="w-5 h-5 text-red-600 shrink-0 mt-0.5" />
                     <div>
                       <p className="font-medium text-red-900">Error</p>
                       <p className="text-sm text-red-700 mt-1">
@@ -360,7 +360,7 @@ export default function TaskModal({
                   <button
                     onClick={handleSubmit}
                     disabled={loading}
-                    className="px-6 py-2.5 text-sm font-semibold text-white bg-gradient-to-r from-blue-600 to-blue-700 rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all disabled:opacity-60 disabled:cursor-not-allowed shadow-sm hover:shadow-md flex items-center justify-center gap-2"
+                    className="px-6 py-2.5 text-sm font-semibold text-white bg-linear-to-r from-blue-600 to-blue-700 rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all disabled:opacity-60 disabled:cursor-not-allowed shadow-sm hover:shadow-md flex items-center justify-center gap-2"
                   >
                     {loading ? (
                       <>
