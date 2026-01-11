@@ -83,16 +83,16 @@ export default function Layout({
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
-                  className="flex items-center gap-2"
+                  className="flex items-center gap-3"
                 >
                   <img
                     src={Logo}
-                    alt="TaskBoard Logo"
-                    className="w-7 h-7 lg:w-8 lg:h-8 rounded-lg object-contain"
+                    alt="Ergo Logo"
+                    className="w-8 h-8 rounded-lg object-contain"
                   />
-                  <span className="font-semibold text-gray-900 dark:text-white text-sm lg:text-base">
+                  <h1 className="font-bold text-gray-900 dark:text-white text-lg lg:text-xl tracking-tight">
                     Ergo
-                  </span>
+                  </h1>
                 </motion.div>
               )}
 
