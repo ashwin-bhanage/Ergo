@@ -3,11 +3,12 @@
 A modern, responsive task management application built with React, Vite, and Tailwind CSS. Features a Kanban board interface with drag-and-drop functionality, real-time filtering, and project management.
 
 ## Desktop Screen
-![Task Board Screenshot](../task-board/src/assets/Ergo%20Frontend.png)
-![Task Board Screenshot](../task-board/src/assets/Ergo%20Frontend-%20Dark%20mode.png)
+![Task Board Screenshot](./src/assets/ergo-frontend.png)
+![Task Board Screenshot](./src/assets/ergo-frontend-dark.png)
 
 ## Mobile Screen
-![Task Board Mobile Screenshot](../task-board/src/assets/Mobile%20Version.png)
+![Task Board Mobile Screenshot](./src/assets/mobile-version.png)
+
 
 
 ## 🚀 Features
