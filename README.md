@@ -102,7 +102,6 @@ task-board/
 ├── public/
 ├── index.html
 ├── vite.config.js
-├── tailwind.config.js
 └── package.json
 ```
 
