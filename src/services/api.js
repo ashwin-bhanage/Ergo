@@ -1,6 +1,5 @@
-const API_BASE_URL = "";
+const API_BASE_URL = "http://localhost:8000";
 
-// Helper function for making requests
 async function request(endpoint, options = {}) {
   const url = `${API_BASE_URL}${endpoint}`;
 
@@ -9,21 +8,32 @@ async function request(endpoint, options = {}) {
       "Content-Type": "application/json",
       ...options.headers,
     },
+    credentials: "include",
     ...options,
   };
 
   try {
     const response = await fetch(url, config);
 
-    // Handle 204 No Content
-    if (response.status === 204) {
-      return null;
+    if (response.status === 204) return null;
+
+    if (response.status === 401) {
+      window.dispatchEvent(new CustomEvent("unauthorized"));
+      throw new Error("Unauthorized");
+    }
+    // 3. SAFE JSON PARSING
+    // Check if the response body exists and is not empty
+    const contentType = response.headers.get("content-type");
+    let data = null;
+
+    if (contentType && contentType.includes("application/json")) {
+      const text = await response.text(); // Get body as text first
+      data = text ? JSON.parse(text) : null; // Only parse if text is not empty
     }
 
-    const data = await response.json();
-
+    // 4. Handle non-OK responses
     if (!response.ok) {
-      throw new Error(data.detail || "Request failed");
+      throw new Error(data?.detail || data?.message || "Request failed");
     }
 
     return data;
@@ -33,7 +43,29 @@ async function request(endpoint, options = {}) {
   }
 }
 
-// User API
+export const authAPI = {
+  login: (email, password) =>
+    request("/auth/login", {
+      method: "POST",
+      body: JSON.stringify({ email, password }),
+    }),
+
+  register: (name, email, password) =>
+    request("/auth/register", {
+      method: "POST",
+      body: JSON.stringify({ name, email, password }),
+    }),
+
+  logout: () =>
+    request("/auth/logout", {
+      method: "POST",
+    }),
+
+  getMe: () =>
+    // Changed to getMe to match AuthContext
+    request("/auth/me"),
+};
+
 export const userAPI = {
   create: (userData) =>
     request("/users", {
@@ -42,33 +74,30 @@ export const userAPI = {
     }),
 
   getAll: () => request("/users"),
+  getById: (id) => request(`/users/${id}`),
 
-  getById: (id) => request(`/users/${id}`), // FIXED: was "getID"
+  // Mapping auth methods
+  login: authAPI.login,
+  register: authAPI.register,
+  logout: authAPI.logout,
+  getMe: authAPI.getMe, // Standardized naming
 };
 
-// Project API
 export const projectAPI = {
-  create: (
-    projectData,
-    userId // FIXED: parameter name
-  ) =>
+  create: (projectData, userId) =>
     request(`/projects?user_id=${userId}`, {
-      // FIXED: removed spaces
       method: "POST",
       body: JSON.stringify(projectData),
     }),
 
-  getAll: () => request("/projects"), // FIXED: was "getALL"
-
-  getById: (id) => request(`/projects/${id}`), // FIXED: was "getID"
-
+  getAll: () => request("/projects"),
+  getById: (id) => request(`/projects/${id}`),
   delete: (id) =>
     request(`/projects/${id}`, {
       method: "DELETE",
     }),
 };
 
-// Task API
 export const taskAPI = {
   create: (taskData) =>
     request("/tasks", {
@@ -83,17 +112,15 @@ export const taskAPI = {
     if (filters.status) params.append("status", filters.status);
 
     const query = params.toString();
-    return request(`/tasks${query ? `?${query}` : ""}`); // FIXED: removed extra ?
+    return request(`/tasks${query ? `?${query}` : ""}`);
   },
 
-  getById: (id) => request(`/tasks/${id}`), // FIXED: was "getID"
-
+  getById: (id) => request(`/tasks/${id}`),
   update: (id, updates) =>
     request(`/tasks/${id}`, {
       method: "PATCH",
       body: JSON.stringify(updates),
     }),
-
   delete: (id) =>
     request(`/tasks/${id}`, {
       method: "DELETE",

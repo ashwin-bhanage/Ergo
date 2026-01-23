@@ -1,33 +1,23 @@
-import { useState, useEffect } from "react";
+// 1. ENSURE BROWSERROUTER IS IN THIS LIST
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { AuthProvider, useAuth } from "./context/AuthContext";
+import LoginPage from "./pages/LoginPage";
+import ProtectedRoute from "./components/ProtectedRoute";
 import Layout from "./components/Layout";
 import KanbanBoard from "./components/KanbanBoard";
 import { userAPI, projectAPI } from "./services/api";
-import { ThemeContext } from "./context/ThemeContext";
+import { useState, useEffect } from "react";
 
-function App() {
+function AppContent() {
+  const { isAuthenticated, loading: authLoading } = useAuth();
   const [users, setUsers] = useState([]);
   const [projects, setProjects] = useState([]);
   const [selectedProject, setSelectedProject] = useState(null);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
-  const [isDarkMode, setIsDarkMode] = useState(() => {
-    const saved = localStorage.getItem("darkMode");
-    return saved ? JSON.parse(saved) : false;
-  });
-
-  useEffect(() => {
-    fetchData();
-  }, [refreshTrigger]);
-
-  useEffect(() => {
-    localStorage.setItem("darkMode", JSON.stringify(isDarkMode));
-    if (isDarkMode) {
-      document.documentElement.classList.add("dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-    }
-  }, [isDarkMode]);
+  const [isDarkMode, setIsDarkMode] = useState(() => localStorage.getItem("darkMode") === "true");
 
   const fetchData = async () => {
+    if (!isAuthenticated) return;
     try {
       const [usersData, projectsData] = await Promise.all([
         userAPI.getAll(),
@@ -35,8 +25,6 @@ function App() {
       ]);
       setUsers(usersData);
       setProjects(projectsData);
-
-      // Set first project as selected if none selected
       if (!selectedProject && projectsData.length > 0) {
         setSelectedProject(projectsData[0]);
       }
@@ -45,34 +33,57 @@ function App() {
     }
   };
 
-  const handleDataUpdate = () => {
-    setRefreshTrigger((prev) => prev + 1);
-  };
+  useEffect(() => {
+    fetchData();
+  }, [isAuthenticated, refreshTrigger]);
 
-  const handleProjectSelect = (project) => {
-    setSelectedProject(project);
-  };
+  useEffect(() => {
+    localStorage.setItem("darkMode", isDarkMode);
+    if (isDarkMode) document.documentElement.classList.add("dark");
+    else document.documentElement.classList.remove("dark");
+  }, [isDarkMode]);
 
-  const toggleTheme = () => {
-    setIsDarkMode((prev) => !prev);
-  };
+  if (authLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-white dark:bg-neutral-900">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
 
   return (
-    <ThemeContext.Provider value={{ isDarkMode, toggleTheme }}>
-      <Layout
-        users={users}
-        projects={projects}
-        selectedProject={selectedProject}
-        onProjectSelect={handleProjectSelect}
-        onDataUpdate={handleDataUpdate}
-      >
-        <KanbanBoard
-          selectedProject={selectedProject}
-          onDataUpdate={handleDataUpdate}
-        />
-      </Layout>
-    </ThemeContext.Provider>
+    <Routes>
+      <Route path="/login" element={isAuthenticated ? <Navigate to="/" replace /> : <LoginPage />} />
+      <Route path="/" element={
+        <ProtectedRoute>
+          <Layout
+            isDarkMode={isDarkMode}
+            onToggleTheme={() => setIsDarkMode(!isDarkMode)}
+            users={users}
+            projects={projects}
+            selectedProject={selectedProject}
+            onProjectSelect={(p) => setSelectedProject(p)}
+            onDataUpdate={() => setRefreshTrigger(prev => prev + 1)}
+          >
+            <KanbanBoard selectedProject={selectedProject} onDataUpdate={() => setRefreshTrigger(prev => prev + 1)} />
+          </Layout>
+        </ProtectedRoute>
+      } />
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
   );
 }
 
+// 2. WRAP WITH BROWSERROUTER HERE
+function App() {
+  return (
+    <BrowserRouter>
+      <AuthProvider>
+        <AppContent />
+      </AuthProvider>
+    </BrowserRouter>
+  );
+}
+
+// 3. MUST HAVE THIS DEFAULT EXPORT
 export default App;
