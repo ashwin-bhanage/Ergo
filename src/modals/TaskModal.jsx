@@ -11,7 +11,6 @@ import {
 import { motion, AnimatePresence } from "motion/react";
 import { taskAPI } from "../services/api.js";
 import { toast } from "sonner";
-import { useTheme } from "../context/ThemeContext";
 
 export default function TaskModal({
   isOpen,
@@ -23,7 +22,6 @@ export default function TaskModal({
   newStatus,
   projectId,
 }) {
-  const { isDarkMode } = useTheme();
   const [formData, setFormData] = useState({
     user_id: "",
     project_id: "",
@@ -59,7 +57,7 @@ export default function TaskModal({
       });
     }
     setErrors({});
-  }, [task, projects, isOpen]);
+  }, [task, projects, isOpen, projectId, newStatus]);
 
   const validate = () => {
     const newErrors = {};
@@ -89,7 +87,6 @@ export default function TaskModal({
         await taskAPI.create(submitData);
       }
 
-      // Wait a brief moment to ensure the backend has processed the request
       await new Promise((resolve) => setTimeout(resolve, 300));
       toast.success(
         task ? "Task updated successfully" : "Task created successfully"
@@ -136,7 +133,6 @@ export default function TaskModal({
     <AnimatePresence>
       {isOpen && (
         <>
-          {/* Backdrop */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -145,39 +141,20 @@ export default function TaskModal({
             className="fixed inset-0 bg-black/60 z-50 backdrop-blur-sm"
           />
 
-          {/* Modal Container */}
           <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4">
             <motion.div
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className={`${
-                isDarkMode
-                  ? "bg-neutral-900 border-neutral-800"
-                  : "bg-white border-gray-100"
-              } rounded-2xl shadow-2xl w-full max-w-2xl max-h-[95vh] sm:max-h-[90vh] flex flex-col overflow-hidden border`}
+              className="bg-white dark:bg-gray-950 border border-gray-100 dark:border-gray-800 rounded-2xl shadow-2xl w-full max-w-2xl max-h-[95vh] sm:max-h-[90vh] flex flex-col overflow-hidden transition-colors"
             >
               {/* Modal Header */}
-              <div
-                className={`flex items-center justify-between px-4 py-4 sm:px-6 sm:py-5 border-b shrink-0 ${
-                  isDarkMode
-                    ? "border-neutral-800 bg-neutral-900"
-                    : "border-gray-100 bg-gray-50"
-                }`}
-              >
+              <div className="flex items-center justify-between px-4 py-4 sm:px-6 sm:py-5 border-b shrink-0 border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-900/50">
                 <div>
-                  <h2
-                    className={`text-lg sm:text-2xl font-bold ${
-                      isDarkMode ? "text-white" : "text-gray-900"
-                    }`}
-                  >
+                  <h2 className="text-lg sm:text-2xl font-bold text-gray-900 dark:text-white">
                     {task ? "Edit Task" : "Create New Task"}
                   </h2>
-                  <p
-                    className={`text-xs sm:text-sm mt-1 ${
-                      isDarkMode ? "text-neutral-400" : "text-gray-500"
-                    }`}
-                  >
+                  <p className="text-xs sm:text-sm mt-1 text-gray-500 dark:text-gray-400">
                     {task
                       ? "Update task details"
                       : "Fill in the details to create a new task"}
@@ -185,28 +162,20 @@ export default function TaskModal({
                 </div>
                 <button
                   onClick={onClose}
-                  className={`p-2 rounded-lg transition-colors shrink-0 ${
-                    isDarkMode
-                      ? "hover:bg-neutral-800 text-neutral-400"
-                      : "hover:bg-gray-200 text-gray-500"
-                  }`}
+                  className="p-2 rounded-lg transition-colors shrink-0 hover:bg-gray-200 dark:hover:bg-gray-800 text-gray-500 dark:text-gray-400"
                 >
                   <X className="w-5 h-5" />
                 </button>
               </div>
 
-              {/* Modal Body - Scrollable */}
+              {/* Modal Body */}
               <form
                 onSubmit={handleSubmit}
                 className="p-4 sm:p-6 space-y-5 sm:space-y-6 overflow-y-auto flex-1"
               >
                 {/* Title */}
                 <div>
-                  <label
-                    className={`block text-sm font-semibold mb-2 ${
-                      isDarkMode ? "text-neutral-200" : "text-gray-900"
-                    }`}
-                  >
+                  <label className="block text-sm font-semibold mb-2 text-gray-900 dark:text-gray-200">
                     Task Title <span className="text-red-500">*</span>
                   </label>
                   <input
@@ -214,11 +183,9 @@ export default function TaskModal({
                     value={formData.title}
                     onChange={(e) => handleChange("title", e.target.value)}
                     placeholder="e.g., Design homepage mockup"
-                    className={`w-full px-4 py-2.5 sm:py-3 border-2 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all ${
-                      isDarkMode
-                        ? "bg-neutral-800 border-neutral-700 text-white placeholder:text-neutral-500"
-                        : "bg-white border-gray-200 text-gray-900 placeholder:text-gray-400"
-                    } ${errors.title ? "border-red-400 bg-red-50/10" : ""}`}
+                    className={`w-full px-4 py-2.5 sm:py-3 border-2 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 ${
+                      errors.title ? "border-red-400 dark:border-red-900 bg-red-50/10" : ""
+                    }`}
                   />
                   {errors.title && (
                     <div className="mt-2 flex items-center gap-1.5 text-sm text-red-500">
@@ -230,171 +197,98 @@ export default function TaskModal({
 
                 {/* Description */}
                 <div>
-                  <label
-                    className={`block text-sm font-semibold mb-2 ${
-                      isDarkMode ? "text-neutral-200" : "text-gray-900"
-                    }`}
-                  >
+                  <label className="block text-sm font-semibold mb-2 text-gray-900 dark:text-gray-200">
                     Description
                   </label>
                   <textarea
                     value={formData.description}
-                    onChange={(e) =>
-                      handleChange("description", e.target.value)
-                    }
+                    onChange={(e) => handleChange("description", e.target.value)}
                     placeholder="Add details..."
                     rows={4}
-                    className={`w-full px-4 py-2.5 sm:py-3 border-2 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all resize-none ${
-                      isDarkMode
-                        ? "bg-neutral-800 border-neutral-700 text-white placeholder:text-neutral-500"
-                        : "bg-white border-gray-200 text-gray-900 placeholder:text-gray-400"
-                    }`}
+                    className="w-full px-4 py-2.5 sm:py-3 border-2 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all resize-none bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500"
                   />
                 </div>
 
-                {/* Row: Assignee & Project */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5">
                   <div>
-                    <label
-                      className={`flex text-sm font-semibold mb-2 items-center gap-2 ${
-                        isDarkMode ? "text-neutral-200" : "text-gray-900"
-                      }`}
-                    >
+                    <label className="flex text-sm font-semibold mb-2 items-center gap-2 text-gray-900 dark:text-gray-200">
                       <User className="w-4 h-4 text-blue-500" />
                       Assignee <span className="text-red-500">*</span>
                     </label>
                     <select
                       value={formData.user_id}
                       onChange={(e) => handleChange("user_id", e.target.value)}
-                      className={`w-full px-4 py-2.5 border-2 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all ${
-                        isDarkMode
-                          ? "bg-neutral-800 border-neutral-700 text-white"
-                          : "bg-white border-gray-200 text-gray-900"
-                      } ${errors.user_id ? "border-red-400" : ""}`}
+                      className={`w-full px-4 py-2.5 border-2 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800 text-gray-900 dark:text-white ${
+                        errors.user_id ? "border-red-400 dark:border-red-900" : ""
+                      }`}
                     >
-                      <option
-                        value=""
-                        className={isDarkMode ? "bg-neutral-900" : ""}
-                      >
-                        Select user...
-                      </option>
+                      <option value="" className="dark:bg-gray-900">Select user...</option>
                       {users.map((u) => (
-                        <option
-                          key={u.id}
-                          value={u.id}
-                          className={isDarkMode ? "bg-neutral-900" : ""}
-                        >
-                          {u.name}
-                        </option>
+                        <option key={u.id} value={u.id} className="dark:bg-gray-900">{u.name}</option>
                       ))}
                     </select>
                   </div>
 
                   <div>
-                    <label
-                      className={`flex text-sm font-semibold mb-2 items-center gap-2 ${
-                        isDarkMode ? "text-neutral-200" : "text-gray-900"
-                      }`}
-                    >
+                    <label className="flex text-sm font-semibold mb-2 items-center gap-2 text-gray-900 dark:text-gray-200">
                       <Book className="w-4 h-4 text-purple-500" />
                       Project <span className="text-red-500">*</span>
                     </label>
                     <select
                       value={formData.project_id}
-                      onChange={(e) =>
-                        handleChange("project_id", e.target.value)
-                      }
-                      className={`w-full px-4 py-2.5 border-2 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all ${
-                        isDarkMode
-                          ? "bg-neutral-800 border-neutral-700 text-white"
-                          : "bg-white border-gray-200 text-gray-900"
-                      } ${errors.project_id ? "border-red-400" : ""}`}
+                      onChange={(e) => handleChange("project_id", e.target.value)}
+                      className={`w-full px-4 py-2.5 border-2 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800 text-gray-900 dark:text-white ${
+                        errors.project_id ? "border-red-400 dark:border-red-900" : ""
+                      }`}
                     >
-                      <option
-                        value=""
-                        className={isDarkMode ? "bg-neutral-900" : ""}
-                      >
-                        Select project...
-                      </option>
+                      <option value="" className="dark:bg-gray-900">Select project...</option>
                       {projects.map((p) => (
-                        <option
-                          key={p.id}
-                          value={p.id}
-                          className={isDarkMode ? "bg-neutral-900" : ""}
-                        >
-                          {p.name}
-                        </option>
+                        <option key={p.id} value={p.id} className="dark:bg-gray-900">{p.name}</option>
                       ))}
                     </select>
                   </div>
                 </div>
 
-                {/* Row: Status, Priority, Due Date */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-5">
                   <div>
-                    <label
-                      className={`block text-sm font-semibold mb-2 ${
-                        isDarkMode ? "text-neutral-200" : "text-gray-900"
-                      }`}
-                    >
+                    <label className="block text-sm font-semibold mb-2 text-gray-900 dark:text-gray-200">
                       Status
                     </label>
                     <select
                       value={formData.status}
                       onChange={(e) => handleChange("status", e.target.value)}
-                      className={`w-full px-4 py-2.5 border-2 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all ${
-                        isDarkMode
-                          ? "bg-neutral-800 border-neutral-700 text-white"
-                          : "bg-white border-gray-200 text-gray-900"
-                      }`}
+                      className="w-full px-4 py-2.5 border-2 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800 text-gray-900 dark:text-white"
                     >
-                      <option value="pending">Pending</option>
-                      <option value="in_progress">In Progress</option>
-                      <option value="completed">Completed</option>
+                      <option value="pending" className="dark:bg-gray-900">Pending</option>
+                      <option value="in_progress" className="dark:bg-gray-900">In Progress</option>
+                      <option value="completed" className="dark:bg-gray-900">Completed</option>
                     </select>
                   </div>
 
                   <div>
-                    <label
-                      className={`flex text-sm font-semibold mb-2 items-center gap-2 ${
-                        isDarkMode ? "text-neutral-200" : "text-gray-900"
-                      }`}
-                    >
+                    <label className="flex text-sm font-semibold mb-2 items-center gap-2 text-gray-900 dark:text-gray-200">
                       <Flag className="w-4 h-4 text-orange-500" /> Priority
                     </label>
                     <select
                       value={formData.priority}
                       onChange={(e) => handleChange("priority", e.target.value)}
-                      className={`w-full px-4 py-2.5 border-2 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all ${
-                        isDarkMode
-                          ? "bg-neutral-800 border-neutral-700 text-white"
-                          : "bg-white border-gray-200 text-gray-900"
-                      }`}
+                      className="w-full px-4 py-2.5 border-2 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800 text-gray-900 dark:text-white"
                     >
-                      <option value="Low">Low</option>
-                      <option value="Normal">Normal</option>
-                      <option value="High">High</option>
+                      <option value="Low" className="dark:bg-gray-900">Low</option>
+                      <option value="Normal" className="dark:bg-gray-900">Normal</option>
+                      <option value="High" className="dark:bg-gray-900">High</option>
                     </select>
                   </div>
 
                   <div className="sm:col-span-2 md:col-span-1">
-                    <label
-                      className={`flex text-sm font-semibold mb-2 items-center gap-2 ${
-                        isDarkMode ? "text-neutral-200" : "text-gray-900"
-                      }`}
-                    >
-                      <CalendarIcon className="w-4 h-4 text-green-500" /> Due
-                      Date
+                    <label className="flex text-sm font-semibold mb-2 items-center gap-2 text-gray-900 dark:text-gray-200">
+                      <CalendarIcon className="w-4 h-4 text-green-500" /> Due Date
                     </label>
                     <input
                       type="date"
                       value={formData.due_date}
                       onChange={(e) => handleChange("due_date", e.target.value)}
-                      className={`w-full px-4 py-2.5 border-2 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all ${
-                        isDarkMode
-                          ? "bg-neutral-800 border-neutral-700 text-white color-scheme-dark"
-                          : "bg-white border-gray-200 text-gray-900"
-                      }`}
+                      className="w-full px-4 py-2.5 border-2 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800 text-gray-900 dark:text-white [color-scheme:light] dark:[color-scheme:dark]"
                     />
                   </div>
                 </div>
@@ -403,11 +297,7 @@ export default function TaskModal({
                   <motion.div
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className={`p-4 border-2 rounded-lg flex items-start gap-3 ${
-                      isDarkMode
-                        ? "bg-red-900/20 border-red-900/50 text-red-400"
-                        : "bg-red-50 border-red-200 text-red-700"
-                    }`}
+                    className="p-4 border-2 rounded-lg flex items-start gap-3 bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-900/50 text-red-700 dark:text-red-400"
                   >
                     <AlertCircle className="w-5 h-5 shrink-0 mt-0.5" />
                     <p className="text-sm font-medium">{errors.submit}</p>
@@ -416,13 +306,7 @@ export default function TaskModal({
               </form>
 
               {/* Modal Footer */}
-              <div
-                className={`flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-between px-4 py-4 sm:px-6 sm:py-5 border-t gap-3 shrink-0 ${
-                  isDarkMode
-                    ? "bg-neutral-900 border-neutral-800"
-                    : "bg-gray-50 border-gray-100"
-                }`}
-              >
+              <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-between px-4 py-4 sm:px-6 sm:py-5 border-t gap-3 shrink-0 bg-gray-50 dark:bg-gray-900/50 border-gray-100 dark:border-gray-800">
                 <div>
                   {task && (
                     <button
@@ -439,11 +323,7 @@ export default function TaskModal({
                   <button
                     type="button"
                     onClick={onClose}
-                    className={`px-4 py-2.5 text-sm font-medium border-2 rounded-lg transition-all ${
-                      isDarkMode
-                        ? "text-neutral-300 bg-neutral-800 border-neutral-700 hover:bg-neutral-700"
-                        : "text-gray-700 bg-white border-gray-200 hover:bg-gray-50"
-                    }`}
+                    className="px-4 py-2.5 text-sm font-medium border-2 rounded-lg transition-all text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700"
                   >
                     Cancel
                   </button>

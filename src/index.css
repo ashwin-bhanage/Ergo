@@ -2,17 +2,22 @@
 
 /* Tailwind v4 Dark Mode Configuration */
 @theme {
-  --color-neutral-50: #fafafa;
-  --color-neutral-100: #f5f5f5;
-  --color-neutral-200: #e5e5e5;
-  --color-neutral-300: #d4d4d4;
-  --color-neutral-400: #a3a3a3;
-  --color-neutral-500: #737373;
-  --color-neutral-600: #525252;
-  --color-neutral-700: #404040;
-  --color-neutral-800: #262626;
-  --color-neutral-900: #171717;
-  --color-neutral-950: #0a0a0a;
+  /* Renamed from neutral to gray to match your @apply text-gray-900 */
+  --color-gray-50: #fafafa;
+  --color-gray-100: #f5f5f5;
+  --color-gray-200: #e5e5e5;
+  --color-gray-300: #d4d4d4;
+  --color-gray-400: #a3a3a3;
+  --color-gray-500: #737373;
+  --color-gray-600: #525252;
+  --color-gray-700: #404040;
+  --color-gray-800: #262626;
+  --color-gray-900: #171717;
+  --color-gray-950: #0a0a0a;
+
+  /* Standard colors used in your @apply */
+  --color-white: #ffffff;
+  --color-black: #000000;
 }
 
 /* Hide scrollbar but keep functionality */
@@ -30,6 +35,7 @@
 /* Apply dark mode styles globally */
 @layer base {
   html {
+    /* Now valid because --color-gray-900 is defined above */
     @apply bg-white text-gray-900;
   }
 
@@ -42,5 +48,8 @@
   }
 }
 
-/* Ensure dark mode variants work properly */
+/* v4 Note: Standard dark mode usually uses the built-in 'dark' variant.
+   If you are using the 'class' strategy, ensure your variant logic
+   matches your JS toggle.
+*/
 @variant dark (&:is(.dark *));
