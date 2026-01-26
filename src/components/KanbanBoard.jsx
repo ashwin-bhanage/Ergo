@@ -559,7 +559,7 @@ function DraggableTask({ task, users, onEdit }) {
         <div className="flex items-center gap-2">
           {assignedUser ? (
             <>
-              <div className="w-6 h-6 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white text-xs font-semibold">
+              <div className="w-6 h-6 bg-linear-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white text-xs font-semibold">
                 {assignedUser.name[0].toUpperCase()}
               </div>
               <span className="text-xs text-gray-600 dark:text-neutral-400">
@@ -714,7 +714,7 @@ function TaskCard({ task, users, onEdit }) {
         <div className="flex items-center gap-2">
           {assignedUser ? (
             <>
-              <div className="w-5 h-5 lg:w-6 lg:h-6 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white text-xs font-semibold">
+              <div className="w-5 h-5 lg:w-6 lg:h-6 bg-linear-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white text-xs font-semibold">
                 {assignedUser.name[0].toUpperCase()}
               </div>
               <span className="text-xs text-gray-600 dark:text-neutral-400 truncate">
