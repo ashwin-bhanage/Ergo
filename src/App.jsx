@@ -81,6 +81,7 @@ function App() {
     <BrowserRouter>
       <AuthProvider>
         <AppContent />
+        <Analytics />
       </AuthProvider>
     </BrowserRouter>
   );
