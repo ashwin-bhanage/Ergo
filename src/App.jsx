@@ -7,6 +7,7 @@ import Layout from "./components/Layout";
 import KanbanBoard from "./components/KanbanBoard";
 import { userAPI, projectAPI } from "./services/api";
 import { useState, useEffect } from "react";
+import { Analytics } from "@vercel/analytics/next"
 
 function AppContent() {
   const { isAuthenticated, loading: authLoading } = useAuth();
